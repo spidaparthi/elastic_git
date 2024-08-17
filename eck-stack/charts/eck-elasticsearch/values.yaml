@@ -143,17 +143,33 @@ nodeSets:
 - name: default
   count: 3
   config:
-    # Comment out when setting the vm.max_map_count via initContainer, as these are mutually exclusive.
-    # For production workloads, it is strongly recommended to increase the kernel setting vm.max_map_count to 262144
-    # and leave node.store.allow_mmap unset.
-    # ref: https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-virtual-memory.html
-    #
     node.store.allow_mmap: false
-    # JVM heap size settings
     heap:
       min: 2g
       max: 2g
   podTemplate:
+    spec:
+      containers:
+      - name: elasticsearch
+        env:
+        - name: node.roles
+          value: "master,data,ingest"
+        resources:
+          limits:
+            cpu: 1
+            memory: 4Gi
+          requests:
+            cpu: 1
+            memory: 4Gi
+  volumeClaimTemplates:
+  - metadata:
+      name: elasticsearch-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 10Gi
+
     # The following spec is exactly the Kubernetes Core V1 PodTemplateSpec. Any fields within the PodTemplateSpec
     # are supported within the 'spec' field below.  Please see below documentation for the exhaustive list of fields.
     #
@@ -162,41 +178,6 @@ nodeSets:
     # Only the commonly overridden/used fields will be noted below.
     #
     spec:
-      # Containers array.  Should only be used to customize the 'elasticsearch' container using the following fields.
-      containers:
-      - name: elasticsearch
-        # List of environment variables to set in the 'elasticsearch' container.
-        # https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/
-        env:
-        - name: node.roles
-          value: "master,data,ingest"
-
-        # Compute Resources required by this container.
-        resources:
-          # Requests describes the minimum amount of compute resources required. If Requests is omitted for a container,
-          # it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined value.
-          #
-          # Defaults used by the ECK Operator, if not specified, are below
-          limits:
-            cpu: 1
-            memory: 4Gi
-          requests:
-            cpu: 1
-            memory: 4Gi
-
-      volumes:
-      - name: elasticsearch-data
-        persistentVolumeClaim:
-          claimName: elasticsearch-data
-    volumeClaimTemplates:
-    - metadata:
-        name: elasticsearch-data
-      spec:
-        accessModes: ["ReadWriteOnce"]
-        resources:
-          requests:
-            storage: 10Gi
-
     # If specified, the pod's scheduling constraints
     # https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-advanced-node-scheduling.html
     # https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
