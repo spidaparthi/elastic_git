@@ -54,8 +54,9 @@ monitoring: {}
 #
 transport:
   tls:
-    selfSignedCertificate:
-      disabled: false
+    # Here we omit selfSignedCertificate to avoid validation errors
+    certificate:
+      secretName: elastic-transport-tls-cert
 
 # Settings to control how Elasticsearch will be accessed.
 # ref: https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-accessing-elastic-services.html
@@ -65,8 +66,9 @@ http:
     spec:
       type: ClusterIP
   tls:
-    selfSignedCertificate:
-      disabled: false
+    # Here we omit selfSignedCertificate to avoid validation errors
+    certificate:
+      secretName: elastic-http-tls-cert
 
 # Control Elasticsearch Secure Settings.
 # ref: https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-es-secure-settings.html#k8s-es-secure-settings
