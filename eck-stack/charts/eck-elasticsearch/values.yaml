@@ -170,7 +170,7 @@ nodeSets:
       accessModes: ["ReadWriteOnce"]
       resources:
         requests:
-          storage: 10Gi # 10 GiB of storage per node
+          storage: 5Gi # 10 GiB of storage per node
       storageClassName: standard # Specify your storage class here
   podTemplate:
     spec:
@@ -178,10 +178,10 @@ nodeSets:
       - name: elasticsearch
         resources:
           limits:
-            cpu: 1000m # Limit CPU to 0.1 core
+            cpu: 1 # Limit CPU to 0.1 core
             memory: 2Gi # Limit memory to 4 GiB
           requests:
-            cpu: 1000m # Request 0.1 core CPU
+            cpu: 1 # Request 0.1 core CPU
             memory: 2Gi # Request 4 GiB memory
 
         # SecurityContext defines the security options the container should be run with.
