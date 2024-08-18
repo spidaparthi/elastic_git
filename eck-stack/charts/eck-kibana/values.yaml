@@ -1,4 +1,3 @@
----
 # Default values for eck-kibana.
 # This is a YAML-formatted file.
 
@@ -42,6 +41,7 @@ spec:
     # will be assumed.
     #
     # namespace: default
+
 
 # Settings for controlling Kibana ingress. Enabling ingress will expose your Kibana instance
 # to the public internet, and as such is disabled by default.
@@ -98,8 +98,8 @@ ingress:
   # ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#name-based-virtual-hosting
   #
   hosts:
-    - host: chart-example.local
-      path: /
+  - host: chart-example.local
+    path: /
 
   # TLS defines whether TLS will be enabled on the Ingress resource.
   #

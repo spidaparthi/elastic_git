@@ -61,7 +61,7 @@ securityContext:
   allowPrivilegeEscalation: false
   capabilities:
     drop:
-      - ALL
+    - ALL
   readOnlyRootFilesystem: true
   runAsNonRoot: true
 
@@ -266,7 +266,7 @@ config:
   disableConfigWatch: false
 
   # exposedNodeLabels is an array of regular expressions of node labels which are allowed to be copied as annotations on Elasticsearch Pods.
-  exposedNodeLabels: [ "topology.kubernetes.io/.*", "failure-domain.beta.kubernetes.io/.*" ]
+  exposedNodeLabels: ["topology.kubernetes.io/.*", "failure-domain.beta.kubernetes.io/.*"]
 
   # ipFamily specifies the IP family to use. Possible values: IPv4, IPv6 and "" (auto-detect)
   ipFamily: ""
@@ -335,9 +335,9 @@ podMonitor:
 # Reference: https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#servicemonitor
 serviceMonitor: {}
 
-  # namespace determines in which namespace the serviceMonitor will be deployed.
-  # If not set the serviceMonitor will be created in the namespace where the Helm release is installed into
-  # namespace: monitoring
+# namespace determines in which namespace the serviceMonitor will be deployed.
+# If not set the serviceMonitor will be created in the namespace where the Helm release is installed into
+# namespace: monitoring
 
 # Globals meant for internal use only
 global:
@@ -346,6 +346,6 @@ global:
   manifestGen: false
   # createOperatorNamespace defines whether the operator namespace manifest should be generated when in manifestGen mode.
   # Usually we do want that to happen (e.g. all-in-one.yaml) but, sometimes we don't (e.g. E2E tests).
-  createOperatorNamespace: true
+  createOperatorNamespace: false
   # kubeVersion is the effective Kubernetes version we target when generating the all-in-one.yaml.
   kubeVersion: 1.21.0
