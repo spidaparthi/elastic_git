@@ -163,6 +163,7 @@ nodeSets:
   count: 3 # 3 replicas
   config:
     node.roles: ["master", "data", "ingest"] # Assigning roles to each node
+    node.store.allow_mmap: false # Disable mmap for better performance
   volumeClaimTemplates:
   - metadata:
       name: elasticsearch-data
