@@ -178,10 +178,10 @@ nodeSets:
       - name: elasticsearch
         resources:
           limits:
-            cpu: 500m # Limit CPU to 1 core
+            cpu: 100m # Limit CPU to 0.1 core
             memory: 1Gi # Limit memory to 4 GiB
           requests:
-            cpu: 500m # Request 1 CPU core
+            cpu: 100m # Request 0.1 core CPU
             memory: 1Gi # Request 4 GiB memory
 
         # SecurityContext defines the security options the container should be run with.
