@@ -170,7 +170,7 @@ nodeSets:
       accessModes: ["ReadWriteOnce"]
       resources:
         requests:
-          storage: 5Gi # 10 GiB of storage per node
+          storage: 10Gi # 10 GiB of storage per node
       storageClassName: standard # Specify your storage class here
   podTemplate:
     spec:
