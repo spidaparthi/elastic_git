@@ -178,11 +178,11 @@ nodeSets:
       - name: elasticsearch
         resources:
           limits:
-            cpu: 1 # Limit CPU to 1 core
-            memory: 4Gi # Limit memory to 4 GiB
+            cpu: 500m # Limit CPU to 1 core
+            memory: 1Gi # Limit memory to 4 GiB
           requests:
-            cpu: 1 # Request 1 CPU core
-            memory: 4Gi # Request 4 GiB memory
+            cpu: 500m # Request 1 CPU core
+            memory: 1Gi # Request 4 GiB memory
 
         # SecurityContext defines the security options the container should be run with.
         # If set, the fields of SecurityContext override the equivalent fields of PodSecurityContext.
