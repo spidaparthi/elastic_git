@@ -178,6 +178,10 @@ nodeSets:
           storage: 10Gi # 10 GiB of storage per node
       storageClassName: standard # Specify your storage class here
   podTemplate:
+    metadata:
+      labels:
+        annotations:
+          traffic.sidecar.istio.io/includeInboundPorts: "*" # Allow all inbound traffic
     spec:
       containers:
       - name: elasticsearch
