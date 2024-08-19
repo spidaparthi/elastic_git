@@ -180,18 +180,21 @@ nodeSets:
   podTemplate:
     metadata:
       labels:
-        annotations:
-          traffic.sidecar.istio.io/includeInboundPorts: "*" # Allow all inbound traffic
+        app: "elasticsearch" # Example label
+        cluster: "default" # Example label
+      annotations: # Move annotations here, outside of labels
+        traffic.sidecar.istio.io/includeInboundPorts: "*" # Allow all inbound traffic
     spec:
       containers:
       - name: elasticsearch
         resources:
           limits:
-            cpu: 1 # Limit CPU to 0.1 core
-            memory: 2Gi # Limit memory to 4 GiB
+            cpu: 1 # Limit CPU to 1 core
+            memory: 2Gi # Limit memory to 2 GiB
           requests:
-            cpu: 1 # Request 0.1 core CPU
-            memory: 2Gi # Request 4 GiB memory
+            cpu: 1 # Request 1 core CPU
+            memory: 2Gi # Request 2 GiB memory
+
 
         # SecurityContext defines the security options the container should be run with.
         # If set, the fields of SecurityContext override the equivalent fields of PodSecurityContext.
