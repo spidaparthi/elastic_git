@@ -69,10 +69,10 @@ transport: {}
 # Settings to control how Elasticsearch will be accessed.
 # ref: https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-accessing-elastic-services.html
 #
-#http:
-#  service:
-#    spec:
-#      type: LoadBalancer
+http:
+  service:
+    spec:
+      type: LoadBalancer
 #http: {}
 # service:
 #   metadata:
@@ -296,26 +296,8 @@ nodeSets:
 # - Azure: https://learn.microsoft.com/en-us/azure/aks/app-routing
 # - Nginx: https://kubernetes.github.io/ingress-nginx/
 #
-#ingress:
-#  enabled: false
 ingress:
-  enabled: true
-  annotations:
-    my: annotation
-  labels:
-    my: label
-  pathType: Prefix
-  hosts:
-  - host: "elasticsearch.my-company.dev"
-    path: "/"
-http:
-  service:
-    metadata:
-      annotations:
-        # This is required for `ClusterIP` services (which are the default ECK service type) to be used with Ingress in GKE clusters.
-        cloud.google.com/neg: '{"ingress": true}'
-        # This is required to enable the GKE Ingress Controller to use HTTPS as the backend protocol.
-        cloud.google.com/app-protocols: '{"https":"HTTPS"}'
+  enabled: false
 
   # Annotations that will be applied to the Ingress resource. Note that some ingress controllers are controlled via annotations.
   # 
@@ -371,7 +353,7 @@ http:
   # ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
   #
   tls:
-    enabled: true
+    enabled: false
     # Optional Kubernetes secret name that contains a base64 encoded PEM certificate and private key that corresponds to the above 'hosts' definitions.
     # If tls is enabled, but this field is not set, the self-signed certificate and key created by the ECK operator will be used.
     # secretName: chart-example-tls
