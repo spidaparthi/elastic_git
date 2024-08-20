@@ -69,10 +69,10 @@ transport: {}
 # Settings to control how Elasticsearch will be accessed.
 # ref: https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-accessing-elastic-services.html
 #
-http:
-  service:
-    spec:
-      type: LoadBalancer
+#http:
+#  service:
+#    spec:
+#      type: LoadBalancer
 #http: {}
 # service:
 #   metadata:
@@ -296,8 +296,26 @@ nodeSets:
 # - Azure: https://learn.microsoft.com/en-us/azure/aks/app-routing
 # - Nginx: https://kubernetes.github.io/ingress-nginx/
 #
+#ingress:
+#  enabled: false
 ingress:
-  enabled: false
+  enabled: true
+  annotations:
+    my: annotation
+  labels:
+    my: label
+  pathType: Prefix
+  hosts:
+  - host: "elasticsearch.my-company.dev"
+    path: "/"
+http:
+  service:
+    metadata:
+      annotations:
+        # This is required for `ClusterIP` services (which are the default ECK service type) to be used with Ingress in GKE clusters.
+        cloud.google.com/neg: '{"ingress": true}'
+        # This is required to enable the GKE Ingress Controller to use HTTPS as the backend protocol.
+        cloud.google.com/app-protocols: '{"https":"HTTPS"}'
 
   # Annotations that will be applied to the Ingress resource. Note that some ingress controllers are controlled via annotations.
   # 
