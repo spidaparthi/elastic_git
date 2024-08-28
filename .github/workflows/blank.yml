@@ -1,0 +1,144 @@
+name: Deploy Elastic on GKE with User and Role Creation
+
+on:
+  workflow_dispatch:
+    inputs:
+      gke_region:
+        description: 'GKE Region'
+        required: true
+        type: string
+      gke_name:
+        description: 'GKE Cluster Name'
+        required: true
+        type: string
+      gke_project:
+        description: 'GKE Project ID'
+        required: true
+        type: string
+      elastic_cluster_name:
+        description: 'Elastic Cluster Name'
+        required: true
+        type: string
+      elastic_namespace:
+        description: 'Elastic Namespace'
+        required: true
+        type: string
+      elastic_version:
+        description: 'Elastic Version'
+        required: true
+        type: string
+      deployment_size:
+        description: 'Deployment Size (Small, Medium, Large)'
+        required: true
+        type: choice
+        options:
+          - Small
+          - Medium
+          - Large
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ inputs.gke_project }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      - name: Authenticate with GKE
+        run: |
+          gcloud container clusters get-credentials ${{ inputs.gke_name }} --region ${{ inputs.gke_region }}
+
+      - name: Set resource parameters based on deployment size
+        id: set-params
+        run: |
+          case ${{ inputs.deployment_size }} in
+            Small)
+              echo "cpu_limit=1" >> $GITHUB_ENV
+              echo "cpu_request=0.5" >> $GITHUB_ENV
+              echo "memory_limit=1Gi" >> $GITHUB_ENV
+              echo "memory_request=512Mi" >> $GITHUB_ENV
+              echo "storage=5Gi" >> $GITHUB_ENV
+              ;;
+            Medium)
+              echo "cpu_limit=2" >> $GITHUB_ENV
+              echo "cpu_request=1" >> $GITHUB_ENV
+              echo "memory_limit=4Gi" >> $GITHUB_ENV
+              echo "memory_request=2Gi" >> $GITHUB_ENV
+              echo "storage=10Gi" >> $GITHUB_ENV
+              ;;
+            Large)
+              echo "cpu_limit=4" >> $GITHUB_ENV
+              echo "cpu_request=2" >> $GITHUB_ENV
+              echo "memory_limit=8Gi" >> $GITHUB_ENV
+              echo "memory_request=4Gi" >> $GITHUB_ENV
+              echo "storage=20Gi" >> $GITHUB_ENV
+              ;;
+            *)
+              echo "Invalid deployment size selected!"
+              exit 1
+              ;;
+          esac
+
+      - name: Deploy CRDs
+        run: |
+          kubectl apply -f manifests/crds.yaml
+
+      - name: Deploy Operator
+        run: |
+          kubectl apply -f manifests/operator.yaml
+
+      - name: Deploy Namespace
+        run: |
+          kubectl create namespace ${{ inputs.elastic_namespace }}
+
+      - name: Deploy ElasticSearch
+        run: |
+          cat manifests/elasticsearch.yaml | envsubst | kubectl apply -n ${{ inputs.elastic_namespace }} -f -
+
+      - name: Deploy Kibana
+        run: |
+          cat manifests/kibana.yaml | envsubst | kubectl apply -n ${{ inputs.elastic_namespace }} -f -
+
+      - name: Deploy ElasticSearch Service
+        run: |
+          cat manifests/elasticsearch-service.yaml | envsubst | kubectl apply -n ${{ inputs.elastic_namespace }} -f -
+
+      - name: Deploy Kibana Service
+        run: |
+          cat manifests/kibana-service.yaml | envsubst | kubectl apply -n ${{ inputs.elastic_namespace }} -f -
+
+      - name: Retrieve ElasticSearch User Password
+        id: get-password
+        run: |
+          PASSWORD=$(kubectl get secret ${{ inputs.elastic_cluster_name }}-es-elastic-user -n ${{ inputs.elastic_namespace }} -o=jsonpath='{.data.elastic}' | base64 --decode)
+          echo "ELASTIC_PASSWORD=${PASSWORD}" >> $GITHUB_ENV
+
+      - name: Create Role in Elasticsearch
+        run: |
+          curl -X POST "https://${{ inputs.elastic_cluster_name }}.${{ inputs.elastic_namespace }}.svc.cluster.local:9200/_security/role/my_custom_role" \
+          -H 'Content-Type: application/json' \
+          -u elastic:${{ env.ELASTIC_PASSWORD }} \
+          -d '{
+            "cluster": ["all"],
+            "indices": [
+              {
+                "names": ["*"],
+                "privileges": ["read", "write"]
+              }
+            ]
+          }'
+
+      - name: Create User in Elasticsearch
+        run: |
+          curl -X POST "https://${{ inputs.elastic_cluster_name }}.${{ inputs.elastic_namespace }}.svc.cluster.local:9200/_security/user/my_new_user" \
+          -H 'Content-Type: application/json' \
+          -u elastic:${{ env.ELASTIC_PASSWORD }} \
+          -d '{
+            "password": "'"${{ secrets.ELASTIC_NEW_USER_PASSWORD }}"'",
+            "roles": ["my_custom_role"],
+            "full_name": "My New User",
+            "email": "user@example.com"
+          }'
