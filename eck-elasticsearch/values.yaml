@@ -1,0 +1,98 @@
+annotations: {}
+auth: {}
+http: {}
+ingress:
+  annotations: {}
+  enabled: false
+  hosts:
+  - host: chart-example.local
+    path: /
+  labels: {}
+  pathType: Prefix
+  tls:
+    enabled: false
+labels: {}
+monitoring: {}
+nodeSets:
+- config:
+    node.roles:
+    - master
+  count: 3
+  name: master
+  podTemplate:
+    spec:
+      - imagePullSecrets:
+        - name: jfrog-secret    # Hard-coded imagePullSecrets for JFrog access
+        containers:
+      - name: elasticsearch
+        resources:
+          limits:
+            cpu: '1'
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
+- config:
+    node.roles:
+    - data
+  count: 2
+  name: data
+  podTemplate:
+    spec:
+      containers:
+      - imagep
+      - name: elasticsearch
+        resources:
+          limits:
+            cpu: '4'
+            memory: 16Gi
+          requests:
+            cpu: '4'
+            memory: 16Gi
+remoteClusters: {}
+secureSettings: []
+transport: {}
+updateStrategy: {}
+version: 8.17.0-SNAPSHOT
+image:
+    repository: jfrog.company.com/myrepo/elasticsearch
+    tag: "v8.18.0"                        # Kibana image version
+virtualService:
+  enabled: true
+  gateway: istio-system/ingressgateway
+  host: elasticsearch.example.com
+  name: elasticsearch-vs
+  namespace: default
+  retries:
+    attempts: 3
+    perTryTimeout: 2s
+  service:
+    name: elasticsearch
+    port: 9200
+volumeClaimDeletePolicy: ''
+namespace:
+  name: elasticsearch-prod   # Name of the namespace for this deployment
+  istioInjection: "enabled"  # Options: "enabled" or "disabled" to control Istio sidecar injection
+kibana:
+  enabled: true                          # Enable or disable Kibana deployment
+  replicaCount: 1                        # Number of Kibana replicas
+  image:
+    repository: docker.elastic.co/kibana/kibana
+    tag: "8.18.0"                        # Kibana image version
+  service:
+    type: ClusterIP                      # Service type: ClusterIP, NodePort, or LoadBalancer
+    port: 5601                           # External service port
+    targetPort: 5601                     # Internal Kibana container port
+  istioInjection: "true"                 # Enable Istio sidecar injection (true/false)
+  serviceAccount: kibana-sa              # Name of the ServiceAccount for Kibana
+  resources:
+    limits:
+      cpu: "1"
+      memory: "2Gi"
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+
+backup:
+  serviceAccount: backup-sa              # ServiceAccount name for backup purposes
+
