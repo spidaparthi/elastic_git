@@ -1,0 +1,163 @@
+Here’s the consolidated document from the beginning, formatted for easy copying into Confluence:
+
+Elasticsearch Deployment on GKE with GitHub Actions
+
+Table of Contents
+
+Introduction
+
+	•	[Overview]
+	•	[Target Audience]
+
+Core Components
+
+	•	[What is Elasticsearch?]
+	•	[Key Features]
+	•	[Use Cases]
+	•	[What is the ECK (Elastic Cloud on Kubernetes) Operator?]
+	•	[Key Features]
+	•	[Benefits in Kubernetes]
+	•	[What is Kibana?]
+	•	[Key Features]
+	•	[Use Cases in Monitoring and Visualization]
+
+Pre-requisites
+
+	•	[Google Kubernetes Engine (GKE) Provisioning]
+	•	[Kernel Parameter Adjustment]
+	•	[External Secrets Setup]
+	•	[Backup Configuration (Optional)]
+	•	[Istio Domain Configuration]
+
+Deployment Pipeline Overview
+
+	•	[High-Level Pipeline Flow]
+	•	[Key Steps in the Deployment Pipeline]
+
+Setting Up GitHub Actions for Deployment
+
+	•	[Required GitHub Actions Workflows]
+	•	[Setting up Secrets and Configurations]
+	•	[Sample GitHub Actions YAML]
+
+GKE Configuration and Access Management
+
+	•	[Google Cloud Setup for GKE]
+	•	[Kubernetes Namespace and Role-Based Access Control (RBAC)]
+	•	[Securing Cluster Access]
+
+Deploying the ECK Operator on GKE
+
+	•	[Installation of ECK Operator]
+	•	[Configuring the Operator for GKE]
+	•	[Managing Resources with ECK]
+
+Deploying Elasticsearch and Kibana on GKE
+
+	•	[Customizing Elasticsearch and Kibana Configurations]
+	•	[Deployment YAML Files for Elasticsearch and Kibana]
+	•	[Applying Kubernetes Manifests with GitHub Actions]
+
+Post-Deployment Verification
+
+	•	[Health Checks for Elasticsearch and Kibana]
+	•	[Running Smoke Tests]
+	•	[Verifying Deployment Status on GKE]
+
+Monitoring and Alerting
+
+	•	[Configuring Metrics and Logging in Kibana]
+	•	[Setting Up Alerts for Cluster Health]
+	•	[Integrating with External Monitoring Tools (e.g., Prometheus, Grafana)]
+
+Troubleshooting and Best Practices
+
+	•	[Common Issues and Solutions]
+	•	[Best Practices for Managing Elasticsearch on GKE]
+	•	[Scaling Recommendations]
+
+Introduction
+
+Overview
+
+This document provides guidance on deploying Elasticsearch and Kibana on Google Kubernetes Engine (GKE) using the Elastic Cloud on Kubernetes (ECK) Operator, with automation managed by GitHub Actions. The goal is to establish a reliable, scalable, and automated deployment pipeline, integrating Elasticsearch for data indexing and search, and Kibana for data visualization and monitoring.
+
+The document is intended for engineering teams looking to leverage GKE as a platform for deploying and managing Elastic Stack components within a Kubernetes ecosystem, with a strong emphasis on infrastructure automation. Engineers will gain insights into configuring GitHub Actions for deployment automation, setting up access controls in GKE, and using Kubernetes-native solutions for managing Elasticsearch clusters.
+
+Target Audience
+
+This guide is intended for DevOps engineers, site reliability engineers (SREs), and platform engineers responsible for managing applications on Kubernetes. Familiarity with Kubernetes, Google Cloud Platform (GCP), and GitHub Actions is recommended.
+
+Core Components
+
+What is Elasticsearch?
+
+Elasticsearch is a highly scalable, distributed search and analytics engine that enables quick and effective full-text search across large datasets. Built on top of Apache Lucene, Elasticsearch is known for its performance in indexing, searching, and analyzing data in real-time. It serves as the core component of the Elastic Stack (often referred to as the ELK Stack, which includes Elasticsearch, Logstash, and Kibana).
+
+Key Features
+
+	•	Distributed Architecture: Elasticsearch is designed to scale horizontally, allowing it to handle large volumes of data by distributing indices and data across multiple nodes.
+	•	Real-Time Search and Analytics: Built for high-speed search, Elasticsearch enables real-time indexing and querying, making it suitable for applications with strict performance requirements.
+	•	RESTful API: The REST API allows easy integration with various programming languages and tools, making Elasticsearch versatile for different application architectures.
+	•	Schema Flexibility: Elasticsearch supports dynamic mapping, allowing it to index new fields automatically without a predefined schema.
+
+Use Cases
+
+Elasticsearch is a versatile tool that is widely adopted across multiple industries for different use cases, such as:
+
+	•	Application Search: Provides fast, relevant search results for web applications, e-commerce, and content management systems.
+	•	Log and Event Data Analysis: Collects and analyzes logs from applications and infrastructure, enabling faster debugging and performance monitoring.
+	•	Security Information and Event Management (SIEM): Helps detect and respond to security threats by analyzing logs and identifying suspicious patterns.
+	•	Data Aggregation and Reporting: Supports powerful aggregation functions, enabling it to serve as a backend for reporting dashboards and data analytics applications.
+
+What is the ECK (Elastic Cloud on Kubernetes) Operator?
+
+The Elastic Cloud on Kubernetes (ECK) Operator is a Kubernetes operator developed by Elastic to manage Elasticsearch, Kibana, and other components of the Elastic Stack as native Kubernetes resources. The ECK Operator simplifies the deployment and lifecycle management of Elasticsearch clusters, making it easier to operate Elasticsearch in a Kubernetes environment.
+
+Key Features
+
+	•	Declarative Management: Manages Elasticsearch and Kibana configurations using Kubernetes manifests, allowing engineers to define cluster specifications declaratively.
+	•	Automated Scaling and Self-Healing: ECK manages scaling and automatically recovers failed nodes, reducing the operational overhead for managing clusters.
+	•	Seamless Upgrades: Supports rolling upgrades for Elasticsearch and Kibana, enabling minimal downtime during updates.
+	•	Integrated Security: Provides native Kubernetes support for managing TLS certificates, role-based access control, and secure communication within the Elastic Stack.
+
+Benefits in Kubernetes
+
+With ECK, Elasticsearch can be managed within Kubernetes as a first-class citizen, benefiting from Kubernetes-native functionalities like scaling, fault tolerance, and observability. This integration allows organizations to centralize the management of Elasticsearch alongside other containerized applications within their Kubernetes clusters, ensuring consistency and efficiency in deployment and monitoring.
+
+What is Kibana?
+
+Kibana is the visualization and analytics platform of the Elastic Stack. It provides a web-based interface for interacting with data stored in Elasticsearch, offering a range of visualization options, dashboards, and exploration tools to analyze and monitor data effectively.
+
+Key Features
+
+	•	Data Visualization: Kibana offers various visualization options (e.g., bar charts, line graphs, pie charts) that enable users to create insightful dashboards and reports.
+	•	Dashboards: Users can build custom dashboards for monitoring application metrics, infrastructure performance, or security events.
+	•	Search and Filtering: Kibana’s Discover tab enables users to search and filter raw data, making it easier to drill down into specific log entries or events.
+	•	Alerting and Reporting: Kibana provides built-in alerting and reporting functionalities that allow users to monitor critical events and generate scheduled reports.
+
+Use Cases in Monitoring and Visualization
+
+Kibana is commonly used for:
+
+	•	Operational Monitoring: Visualizing application and infrastructure metrics to identify performance bottlenecks.
+	•	Log Analysis: Exploring log data from applications, networks, and security systems.
+	•	Security Monitoring: Detecting and analyzing security incidents by visualizing and querying security logs.
+	•	Business Intelligence: Aggregating and visualizing data from multiple sources for real-time insights.
+
+Pre-requisites
+
+Before proceeding with the deployment, ensure the following requirements are met:
+
+	1.	Google Kubernetes Engine (GKE) Provisioning
+A GKE cluster should already be provisioned for deploying Elasticsearch and Kibana. If GKE has not been set up, refer to the following link for an overview and setup instructions: GKE provisioning overview.
+	2.	Kernel Parameter Adjustment
+Elasticsearch recommends configuring the GKE infrastructure to ensure efficient memory mapping. The vm.max_map_count setting should be set to 262144 on the Kubernetes nodes. If this has not been configured, refer to the following Confluence document to set it up: Confluence document.
+	3.	External Secrets Setup
+The deployment pipeline uses external secrets to sync username and password credentials for the elastic-admin user. Ensure this is configured with Active Directory permissions for the pe db eng group to allow secure access to these credentials.
+	4.	Backup Configuration (Optional)
+If backups are required for the Elasticsearch cluster, create a CMEK-enabled Google Cloud Storage (GCS) bucket in the same GCP project. This bucket will be used for storing Elasticsearch snapshots, and its details should be passed to the pipeline.
+	5.	Istio Domain Configuration
+The pipeline will expose Elasticsearch and Kibana over dedicated Istio-managed domain names. If Istio has not been configured for these services, refer to the following document to complete the setup: Istio domain names.
+
+Let me know when you’re ready for the next section, or if there are any modifications you’d like!
