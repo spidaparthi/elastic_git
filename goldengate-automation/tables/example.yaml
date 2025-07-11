@@ -1,0 +1,4 @@
+schema: HR
+table: JOBS
+dbs:
+  - proddb

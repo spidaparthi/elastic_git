@@ -1,0 +1,3 @@
+pyyaml
+yamllint
+cx_Oracle
