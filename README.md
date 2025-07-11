@@ -82,3 +82,12 @@ helm unittest -3 -f 'templates/tests/*.yaml' --with-subchart=false .
 ## Licensing
 
 The ECK Helm Charts are licensed under the [Elastic License 2.0](https://www.elastic.co/licensing/elastic-license) like the operator. They can be used with a Basic license for free.
+
+## Goldengate Automation
+
+This repository contains a sample automation for managing Oracle
+Goldengate tables via GitLab CI/CD in the `goldengate-automation`
+directory. Merge request pipelines perform validation and testing of new
+table definitions. After a merge to `master` the deployment job updates
+the Goldengate configuration on the EC2 host.
+
