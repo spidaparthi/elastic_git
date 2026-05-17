@@ -1,0 +1,43 @@
+image: python:3.10-slim
+
+stages:
+  - lint
+  - validate
+  - db
+
+variables:
+  PYTHONUNBUFFERED: '1'
+
+before_script:
+  - pip install --quiet yamllint PyYAML jsonschema
+
+lint_yaml:
+  stage: lint
+  script:
+    - yamllint goldengate-replication/tables/tables-to-replicate.yaml
+
+validate_schema:
+  stage: validate
+  script:
+    - python goldengate-replication/scripts/validate_yaml_schema.py goldengate-replication/tables/tables-to-replicate.yaml goldengate-replication/schemas/table_schema.json
+
+check_duplicates:
+  stage: validate
+  script:
+    - git fetch origin master
+    - git show origin/master:goldengate-replication/tables/tables-to-replicate.yaml > base.yaml || echo "tables: []" > base.yaml
+    - python goldengate-replication/scripts/check_duplicate_tables.py base.yaml goldengate-replication/tables/tables-to-replicate.yaml
+
+detect_diffs:
+  stage: validate
+  script:
+    - python goldengate-replication/scripts/detect_table_pod_diffs.py base.yaml goldengate-replication/tables/tables-to-replicate.yaml goldengate-replication/new_tables.txt
+  artifacts:
+    paths:
+      - goldengate-replication/new_tables.txt
+    when: always
+
+validate_db:
+  stage: db
+  script:
+    - python goldengate-replication/scripts/validate_table_exists.py goldengate-replication/new_tables.txt

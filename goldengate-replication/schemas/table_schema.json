@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "tables": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["schema", "name", "pods"],
+        "properties": {
+          "schema": {"type": "string"},
+          "name": {"type": "string"},
+          "pods": {
+            "type": "array",
+            "items": {"type": "string"},
+            "minItems": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["tables"],
+  "additionalProperties": false
+}

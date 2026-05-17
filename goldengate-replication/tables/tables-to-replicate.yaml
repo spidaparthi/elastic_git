@@ -1,0 +1,4 @@
+tables:
+  - schema: CUSER
+    name: BILLPAY
+    pods: [pod1, pod2]
